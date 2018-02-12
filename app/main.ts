@@ -2,12 +2,21 @@ interface Candidate {
   chromosome: Buffer;
   fitness: number;
 }
+enum CrossoverMethod {
+  SinglePoint,
+  DoublePoint,
+  Uniform,
+  ThreeParent,
+  All
+}
 class GeneticAlgorithm {
   private Population: Array<Candidate>;
   private Solution: Buffer;
+  private Crossover: CrossoverMethod;
 
-  constructor(popSize: number, solution: string) {
+  constructor(popSize: number, solution: string, crossMethod: CrossoverMethod) {
     this.Solution = Buffer.from(solution);
+    this.Crossover = CrossoverMethod.SinglePoint;
     this.Population = this.generatePopulation(popSize);
   }
   private generatePopulation(popSize: number): Array<Candidate> {
@@ -58,6 +67,50 @@ class GeneticAlgorithm {
     }
     return fitness;
   }
+  private selectParents(): Array<Candidate> {
+    return null;
+  }
+  private crossover(method: CrossoverMethod): void {
+    switch (method) {
+      case CrossoverMethod.SinglePoint:
+      {
+        break;
+      }
+      case CrossoverMethod.DoublePoint:
+      {
+        break;
+      }
+      case CrossoverMethod.Uniform:
+      {
+        break;
+      }
+      case CrossoverMethod.ThreeParent:
+      {
+        break;
+      }
+      case CrossoverMethod.All:
+      {
+
+      }
+    }
+  }
+  private mutate(): void {
+
+  }
+  private selectSurvivors(): Array<Candidate> {
+    return null;
+  }
+  public computeGeneration(): boolean {
+    this.selectParents();
+    this.crossover(this.Crossover);
+    this.mutate();
+    this.selectSurvivors();
+    return true;
+  }
 }
 
-const GA = new GeneticAlgorithm(10, "hello00");
+const GA = new GeneticAlgorithm(10, "hello00", CrossoverMethod.SinglePoint);
+var solution: boolean = false;
+do {
+  solution = GA.computeGeneration();
+} while (!solution)
