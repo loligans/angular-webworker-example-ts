@@ -4,14 +4,12 @@ interface Candidate {
 }
 class GeneticAlgorithm {
   private Population: Array<Candidate>;
-  private Solution: string;
+  private Solution: Buffer;
 
   constructor(popSize: number, solution: string) {
-    this.Solution = solution;
+    this.Solution = Buffer.from(solution);
     this.Population = this.generatePopulation(popSize);
-    
   }
-
   private generatePopulation(popSize: number): Array<Candidate> {
     // Initialize our population and declare chromosome and fitness.
     var population = new Array<Candidate>(popSize);
@@ -22,10 +20,7 @@ class GeneticAlgorithm {
     for(var i = 0; i < popSize; i++) {
       chromosome = this.generateChromosome(this.Solution.length);
       fitness = this.calculateFitness(chromosome);
-      this.Population[i] = { 
-        chromosome: chromosome,
-        fitness: fitness
-      }
+      population[i] = { chromosome, fitness };
     }
     return population;
   }
@@ -39,18 +34,30 @@ class GeneticAlgorithm {
     var randomChar: number;
     for (var i = 0; i < length; i++)
     {
-      randomChar = Math.floor(Math.random() * (max - min + 1) + min);
+      randomChar = Math.floor(Math.random() * (max - min) + min);
       randomChromosome += String.fromCharCode(randomChar);
     }
 
     // Returns the chromosome as a buffer
     return Buffer.from(randomChromosome, 'utf8');
   }
-
   private calculateFitness(chromosome: Buffer): number {
-    // Some mathematical formula to calculate fitness
-    return 0.0
+    // Start at perfect fitness
+    const geneRange: number = 94;
+    var fitness = geneRange * this.Solution.length;
+
+    // Declare the genes
+    var chromosomeGene: number;
+    var solutionGene: number;
+
+    // Determine the fitness of every gene
+    for (var i = 0; i < this.Solution.length; i++) {
+      chromosomeGene = chromosome[i];
+      solutionGene = this.Solution[i];
+      fitness -= Math.abs(solutionGene - chromosomeGene);
+    }
+    return fitness;
   }
 }
 
-const GA = new GeneticAlgorithm(500, "hello");
+const GA = new GeneticAlgorithm(10, "hello00");
