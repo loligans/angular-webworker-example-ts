@@ -1,37 +1,40 @@
-interface Candidate {
-  chromosome: Buffer;
-  fitness: number;
-}
-enum CrossoverMethod {
-  SinglePoint,
-  DoublePoint,
-  Uniform,
-  ThreeParent,
-  All
+class Candidate {
+  private readonly GeneticAlgorithm: GeneticAlgorithm;
+  public readonly Chromosome: Buffer;
+  public readonly Fitness: number;
+
+  constructor(chromosome: Buffer, geneticAlgorithm: GeneticAlgorithm) {
+    this.GeneticAlgorithm = geneticAlgorithm;
+    this.Chromosome = chromosome;
+    this.Fitness = this.calculateFitness();
+  }
+  private calculateFitness(): number {
+    // Start at perfect fitness
+    const geneRange: number = 94;
+    var fitness = geneRange * this.GeneticAlgorithm.Solution.length;
+
+    // Declare the genes
+    var chromosomeGene: number;
+    var solutionGene: number;
+
+    // Determine the fitness of every gene
+    for (var i = 0; i < this.GeneticAlgorithm.Solution.length; i++) {
+      chromosomeGene = this.Chromosome[i];
+      solutionGene = this.GeneticAlgorithm.Solution[i];
+      fitness -= Math.abs(solutionGene - chromosomeGene);
+    }
+
+    return fitness;
+  }
 }
 class GeneticAlgorithm {
+  public readonly Solution: Buffer;
   private Population: Array<Candidate>;
-  private Solution: Buffer;
-  private Crossover: CrossoverMethod;
+  private PopulationFitness: number;
 
-  constructor(popSize: number, solution: string, crossMethod: CrossoverMethod) {
-    this.Solution = Buffer.from(solution);
-    this.Crossover = CrossoverMethod.SinglePoint;
+  constructor(popSize: number, solution: string) {
+    this.Solution = Buffer.from(solution, 'utf8');
     this.Population = this.generatePopulation(popSize);
-  }
-  private generatePopulation(popSize: number): Array<Candidate> {
-    // Initialize our population and declare chromosome and fitness.
-    var population = new Array<Candidate>(popSize);
-    var chromosome: Buffer;
-    var fitness: number;
-
-    // Fill the population with candidates
-    for(var i = 0; i < popSize; i++) {
-      chromosome = this.generateChromosome(this.Solution.length);
-      fitness = this.calculateFitness(chromosome);
-      population[i] = { chromosome, fitness };
-    }
-    return population;
   }
   private generateChromosome(length: number): Buffer {
     // The allowable range of characters
@@ -50,67 +53,81 @@ class GeneticAlgorithm {
     // Returns the chromosome as a buffer
     return Buffer.from(randomChromosome, 'utf8');
   }
-  private calculateFitness(chromosome: Buffer): number {
-    // Start at perfect fitness
-    const geneRange: number = 94;
-    var fitness = geneRange * this.Solution.length;
+  private generatePopulation(popSize: number): Array<Candidate> {
+    // Initialize our population and declare chromosome and fitness.
+    var population = new Array<Candidate>(popSize);
+    var chromosome: Buffer;
 
-    // Declare the genes
-    var chromosomeGene: number;
-    var solutionGene: number;
-
-    // Determine the fitness of every gene
-    for (var i = 0; i < this.Solution.length; i++) {
-      chromosomeGene = chromosome[i];
-      solutionGene = this.Solution[i];
-      fitness -= Math.abs(solutionGene - chromosomeGene);
+    // Fill the population with candidates
+    for(var i = 0; i < popSize; i++) {
+      chromosome = this.generateChromosome(this.Solution.length);
+      population[i] = new Candidate(chromosome, this);
+      this.PopulationFitness += population[i].Fitness;
     }
-    return fitness;
-  }
-  private selectParents(): Array<Candidate> {
-    return null;
-  }
-  private crossover(method: CrossoverMethod): void {
-    switch (method) {
-      case CrossoverMethod.SinglePoint:
-      {
-        break;
-      }
-      case CrossoverMethod.DoublePoint:
-      {
-        break;
-      }
-      case CrossoverMethod.Uniform:
-      {
-        break;
-      }
-      case CrossoverMethod.ThreeParent:
-      {
-        break;
-      }
-      case CrossoverMethod.All:
-      {
 
+    // Sort population by fitness
+    population.sort((a, b) => b.Fitness - a.Fitness);
+    return population;
+  }
+  private selectSurvivors(): Array<Candidate> {
+    // Initialize the surviving parents collection
+    var numSurvivingParents: number = 100;
+    var survivingParents = new Array<Candidate>();
+    
+    // Calculate the stochastic interval and starting point
+    var interval: number = this.PopulationFitness / numSurvivingParents;
+    var startingPoint = Math.floor(Math.random() * (interval - 0) + 0);
+
+    // Calculate the points 
+    var points = [];
+    for (var i = 0; i < numSurvivingParents; i++) {
+      points.push(startingPoint + (i * interval));
+    }
+
+    // Stochastic universal sampling
+    var fitnessSum: number = 0;
+    var index: number;
+    for (var p of points) {
+      index = 0;
+      fitnessSum = 0;
+      while (fitnessSum < p) {
+        fitnessSum += this.Population[index].Fitness
+        index++;
       }
+      survivingParents.push(this.Population[index]);
+    }
+
+    return survivingParents;
+  }
+  private crossover() {
+    var parent1: Candidate;
+    var parent2: Candidate;
+
+    for (var i = 0; i < this.Population.length; i+=2) {
+      parent1 = this.Population[i];
+      parent2 = this.Population[i+1];
+      console.log(parent1, parent2);
     }
   }
   private mutate(): void {
+    //
+  }
+  private sortPopulationFitness() {
+    this.PopulationFitness = 0;
+    for (var candidate of this.Population) {
+      this.PopulationFitness += candidate.Fitness;
+    }
+    this.Population.sort((a, b) => b.Fitness - a.Fitness);
+  }
 
-  }
-  private selectSurvivors(): Array<Candidate> {
-    return null;
-  }
   public computeGeneration(): boolean {
-    this.selectParents();
-    this.crossover(this.Crossover);
+    // this.selectSurvivors();
+    this.crossover();
     this.mutate();
-    this.selectSurvivors();
+    // this.sortPopulationFitness();
     return true;
   }
 }
 
-const GA = new GeneticAlgorithm(10, "hello00", CrossoverMethod.SinglePoint);
-var solution: boolean = false;
-do {
-  solution = GA.computeGeneration();
-} while (!solution)
+var GA: GeneticAlgorithm;
+GA = new GeneticAlgorithm(500, "hello");
