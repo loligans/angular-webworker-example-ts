@@ -9,10 +9,10 @@ var sourcemaps = require('gulp-sourcemaps');
 var clean = require('gulp-clean');
 var nodemon = require('gulp-nodemon');
 
-var serverTsProject = ts.createProject('app/tsconfig.json');
+var serverTsProject = ts.createProject('genetic-algorithm/tsconfig.json');
 
 gulp.task('clean', () => {
-  return gulp.src('dist/**/*', {read: false}).pipe(clean());
+  return gulp.src('out/genetic-algorithm-js', {read: false}).pipe(clean());
 });
 
 gulp.task('build', ['clean'], () => {
@@ -20,12 +20,14 @@ gulp.task('build', ['clean'], () => {
                         .pipe(sourcemaps.init())
                         .pipe(serverTsProject())
                         .js
-                        .pipe(babel())
+                        .pipe(babel({
+                          presets: ['env']
+                        }))
                         //.pipe(uglify())
                         .pipe(sourcemaps.write('.'))
-                        .pipe(gulp.dest('dist/app'));
+                        .pipe(gulp.dest('out/genetic-algorithm-js'));
 });
 
 gulp.task('start', () => {
-  return spawn('node', ['dist/app/main.js'], {stdio: 'inherit'});
+  return spawn('node', ['out/genetic-algorithm-js/main.js'], {stdio: 'inherit'});
 });
