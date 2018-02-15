@@ -1,5 +1,6 @@
 class Candidate {
   private readonly GeneticAlgorithm: GeneticAlgorithm;
+  public static readonly GeneRange: number = 94;
   public readonly Chromosome: Buffer;
   public readonly Fitness: number;
 
@@ -33,8 +34,12 @@ class GeneticAlgorithm {
   private PopulationFitness: number;
 
   constructor(popSize: number, solution: string) {
+    if (popSize % 2 === 1) popSize += 1;
     this.Solution = Buffer.from(solution, 'utf8');
     this.Population = this.generatePopulation(popSize);
+  }
+  private randomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min) + min);
   }
   private generateChromosome(length: number): Buffer {
     // The allowable range of characters
@@ -46,7 +51,7 @@ class GeneticAlgorithm {
     var randomChar: number;
     for (var i = 0; i < length; i++)
     {
-      randomChar = Math.floor(Math.random() * (max - min) + min);
+      randomChar = this.randomInt(min, max);
       randomChromosome += String.fromCharCode(randomChar);
     }
 
@@ -69,18 +74,18 @@ class GeneticAlgorithm {
     population.sort((a, b) => b.Fitness - a.Fitness);
     return population;
   }
-  private selectSurvivors(): Array<Candidate> {
+  private selectParents(): Array<Candidate> {
     // Initialize the surviving parents collection
-    var numSurvivingParents: number = 100;
-    var survivingParents = new Array<Candidate>();
+    var numParents: number = this.Population.length * .80;
+    var parents = new Array<Candidate>();
     
     // Calculate the stochastic interval and starting point
-    var interval: number = this.PopulationFitness / numSurvivingParents;
-    var startingPoint = Math.floor(Math.random() * (interval - 0) + 0);
+    var interval: number = this.PopulationFitness / numParents;
+    var startingPoint = this.randomInt(0, interval);
 
     // Calculate the points 
     var points = [];
-    for (var i = 0; i < numSurvivingParents; i++) {
+    for (var i = 0; i < numParents; i++) {
       points.push(startingPoint + (i * interval));
     }
 
@@ -94,23 +99,74 @@ class GeneticAlgorithm {
         fitnessSum += this.Population[index].Fitness
         index++;
       }
-      survivingParents.push(this.Population[index]);
+      parents.push(this.Population[index]);
     }
-
-    return survivingParents;
+    
+    return parents;
   }
-  private crossover() {
+  private crossover(parents: Array<Candidate>): Array<Candidate> {
+    // Calculate the number of children to produce
+    var children = new Array<Candidate>();
+
     var parent1: Candidate;
     var parent2: Candidate;
-
-    for (var i = 0; i < this.Population.length; i+=2) {
+    var child1: Buffer;
+    var child2: Buffer;
+    var crossLocation: number;
+    for (var i = 0; i < parents.length; i += 2) {
+      crossLocation = this.randomInt(1, this.Solution.length);
       parent1 = this.Population[i];
       parent2 = this.Population[i+1];
-      console.log(parent1, parent2);
+
+      // Swap genes
+      child1 = Buffer.concat([
+        parent1.Chromosome.slice(0, crossLocation), 
+        parent2.Chromosome.slice(crossLocation)
+      ], this.Solution.length);
+      child2 = Buffer.concat([
+        parent2.Chromosome.slice(0, crossLocation), 
+        parent1.Chromosome.slice(crossLocation)
+      ], this.Solution.length);
+
+      // add children
+      children.push(
+        new Candidate(child1, this), 
+        new Candidate(child2, this)
+      );
+    }
+
+    return children;
+  }
+  private mutate(children: Array<Candidate>): void {
+    // Chance to mutate 1/200 (.005%)
+    const max: number = 50;
+    const min: number = 0;
+
+    // The allowable range of characters
+    const geneMax = 127;
+    const geneMin = 32;
+
+    var mutate: boolean;
+    var location: number;
+    for(var child of children) {
+      mutate = this.randomInt(min, max) == 0 ? true : false;
+      if (mutate) {
+        // Mutate the child in random location
+        location = this.randomInt(0, this.Solution.length);
+        child.Chromosome[location] = this.randomInt(geneMin, geneMax);
+      }
     }
   }
-  private mutate(): void {
-    //
+  private selectSurvivors(): Array<Candidate> {
+    const popSize: number = this.Population.length;
+    const topPercentCandidates = popSize * .20;
+    var survivors = new Array<Candidate>();
+
+    for (var i = 0; i < topPercentCandidates; i++) {
+      survivors.push(new Candidate(this.Population[i].Chromosome, this));
+    }
+    // Maybe choose a better selection method later on.
+    return survivors;
   }
   private sortPopulationFitness() {
     this.PopulationFitness = 0;
@@ -119,15 +175,51 @@ class GeneticAlgorithm {
     }
     this.Population.sort((a, b) => b.Fitness - a.Fitness);
   }
-
   public computeGeneration(): boolean {
-    // this.selectSurvivors();
-    this.crossover();
-    this.mutate();
-    // this.sortPopulationFitness();
-    return true;
+    // Create the children of the next generation
+    var parents = this.selectParents();
+    var children = this.crossover(parents);
+    this.mutate(children);
+
+    // Determine who makes it to the next generation
+    var survivors = this.selectSurvivors();
+
+    // Update the population with the new children and survivors then resort
+    this.Population = new Array<Candidate>(...children, ...survivors);
+    this.sortPopulationFitness();
+
+    var solution = false;
+    var maxFitness = Candidate.GeneRange * this.Solution.length;
+    var candidate: Candidate;
+    for (var i = 0; i < this.Population.length; i++) {
+      candidate = this.Population[i];
+      if (candidate.Fitness >= maxFitness) {
+        solution = true;
+        break;
+      }
+    }
+
+    // Determine if solution was found
+    return solution;
   }
+
+  public get population() : Array<Candidate> {
+    return this.Population;
+  }
+  
 }
 
-var GA: GeneticAlgorithm;
-GA = new GeneticAlgorithm(500, "hello");
+var GA = new GeneticAlgorithm(500, "I destroy my enemy when I make him my friend. - Abraham Lincoln");
+var solution = false;
+for (var i = 1; i <= 10000; i++)
+{
+  solution = GA.computeGeneration();
+  if (i % 500 === 0) {
+    console.log(`Generation ${i}: ${GA.population[0].Chromosome.toString()}`)
+  }
+  if (solution) {
+    console.log(`Generation ${i}: ${GA.population[0].Chromosome.toString()}`);
+    console.log(`Solution found on generation ${i}`);
+    break;
+  }
+}

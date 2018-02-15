@@ -26,6 +26,6 @@ gulp.task('build', ['clean'], () => {
                         .pipe(gulp.dest('dist/app'));
 });
 
-gulp.task('start', ['build'], () => {
+gulp.task('start', () => {
   return spawn('node', ['dist/app/main.js'], {stdio: 'inherit'});
 });
