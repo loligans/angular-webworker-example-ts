@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "../dist/app",
+    "outDir": "../dist/client-app",
     "baseUrl": "./",
     "module": "es2015",
     "sourceMap": true,

@@ -1,42 +1,15 @@
-class Candidate {
-  private readonly GeneticAlgorithm: GeneticAlgorithm;
-  public static readonly GeneRange: number = 94;
-  public readonly Chromosome: Buffer;
-  public readonly Fitness: number;
-
-  constructor(chromosome: Buffer, geneticAlgorithm: GeneticAlgorithm) {
-    this.GeneticAlgorithm = geneticAlgorithm;
-    this.Chromosome = chromosome;
-    this.Fitness = this.calculateFitness();
-  }
-  private calculateFitness(): number {
-    // Start at perfect fitness
-    const geneRange: number = 94;
-    var fitness = geneRange * this.GeneticAlgorithm.Solution.length;
-
-    // Declare the genes
-    var chromosomeGene: number;
-    var solutionGene: number;
-
-    // Determine the fitness of every gene
-    for (var i = 0; i < this.GeneticAlgorithm.Solution.length; i++) {
-      chromosomeGene = this.Chromosome[i];
-      solutionGene = this.GeneticAlgorithm.Solution[i];
-      fitness -= Math.abs(solutionGene - chromosomeGene);
-    }
-
-    return fitness;
-  }
-}
-class GeneticAlgorithm {
+import { Candidate } from './candidate';
+export class GeneticAlgorithm {
   public readonly Solution: Buffer;
-  private Population: Array<Candidate>;
-  private PopulationFitness: number;
+  private _Population: Array<Candidate>;
+  private _PopulationFitness: number;
+  public get Population(): Array<Candidate> { return this._Population; }
+  public get PopulationFitness(): number { return this._PopulationFitness; }
 
   constructor(popSize: number, solution: string) {
     if (popSize % 2 === 1) popSize += 1;
     this.Solution = Buffer.from(solution, 'utf8');
-    this.Population = this.generatePopulation(popSize);
+    this._Population = this.generatePopulation(popSize);
   }
   private randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min) + min);
@@ -67,7 +40,7 @@ class GeneticAlgorithm {
     for(var i = 0; i < popSize; i++) {
       chromosome = this.generateChromosome(this.Solution.length);
       population[i] = new Candidate(chromosome, this);
-      this.PopulationFitness += population[i].Fitness;
+      this._PopulationFitness += population[i].Fitness;
     }
 
     // Sort population by fitness
@@ -76,11 +49,11 @@ class GeneticAlgorithm {
   }
   private selectParents(): Array<Candidate> {
     // Initialize the surviving parents collection
-    var numParents: number = this.Population.length * .80;
+    var numParents: number = this._Population.length * .80;
     var parents = new Array<Candidate>();
     
     // Calculate the stochastic interval and starting point
-    var interval: number = this.PopulationFitness / numParents;
+    var interval: number = this._PopulationFitness / numParents;
     var startingPoint = this.randomInt(0, interval);
 
     // Calculate the points 
@@ -96,10 +69,10 @@ class GeneticAlgorithm {
       index = 0;
       fitnessSum = 0;
       while (fitnessSum < p) {
-        fitnessSum += this.Population[index].Fitness
+        fitnessSum += this._Population[index].Fitness
         index++;
       }
-      parents.push(this.Population[index]);
+      parents.push(this._Population[index]);
     }
     
     return parents;
@@ -115,8 +88,8 @@ class GeneticAlgorithm {
     var crossLocation: number;
     for (var i = 0; i < parents.length; i += 2) {
       crossLocation = this.randomInt(1, this.Solution.length);
-      parent1 = this.Population[i];
-      parent2 = this.Population[i+1];
+      parent1 = this._Population[i];
+      parent2 = this._Population[i+1];
 
       // Swap genes
       child1 = Buffer.concat([
@@ -158,22 +131,22 @@ class GeneticAlgorithm {
     }
   }
   private selectSurvivors(): Array<Candidate> {
-    const popSize: number = this.Population.length;
+    const popSize: number = this._Population.length;
     const topPercentCandidates = popSize * .20;
     var survivors = new Array<Candidate>();
 
     for (var i = 0; i < topPercentCandidates; i++) {
-      survivors.push(new Candidate(this.Population[i].Chromosome, this));
+      survivors.push(new Candidate(this._Population[i].Chromosome, this));
     }
     // Maybe choose a better selection method later on.
     return survivors;
   }
   private sortPopulationFitness() {
-    this.PopulationFitness = 0;
-    for (var candidate of this.Population) {
-      this.PopulationFitness += candidate.Fitness;
+    this._PopulationFitness = 0;
+    for (var candidate of this._Population) {
+      this._PopulationFitness += candidate.Fitness;
     }
-    this.Population.sort((a, b) => b.Fitness - a.Fitness);
+    this._Population.sort((a, b) => b.Fitness - a.Fitness);
   }
   public computeGeneration(): boolean {
     // Create the children of the next generation
@@ -185,14 +158,14 @@ class GeneticAlgorithm {
     var survivors = this.selectSurvivors();
 
     // Update the population with the new children and survivors then resort
-    this.Population = new Array<Candidate>(...children, ...survivors);
+    this._Population = new Array<Candidate>(...children, ...survivors);
     this.sortPopulationFitness();
 
     var solution = false;
     var maxFitness = Candidate.GeneRange * this.Solution.length;
     var candidate: Candidate;
-    for (var i = 0; i < this.Population.length; i++) {
-      candidate = this.Population[i];
+    for (var i = 0; i < this._Population.length; i++) {
+      candidate = this._Population[i];
       if (candidate.Fitness >= maxFitness) {
         solution = true;
         break;
@@ -201,25 +174,5 @@ class GeneticAlgorithm {
 
     // Determine if solution was found
     return solution;
-  }
-
-  public get population() : Array<Candidate> {
-    return this.Population;
-  }
-  
-}
-
-var GA = new GeneticAlgorithm(500, "I destroy my enemy when I make him my friend. - Abraham Lincoln");
-var solution = false;
-for (var i = 1; i <= 10000; i++)
-{
-  solution = GA.computeGeneration();
-  if (i % 500 === 0) {
-    console.log(`Generation ${i}: ${GA.population[0].Chromosome.toString()}`)
-  }
-  if (solution) {
-    console.log(`Generation ${i}: ${GA.population[0].Chromosome.toString()}`);
-    console.log(`Solution found on generation ${i}`);
-    break;
   }
 }
