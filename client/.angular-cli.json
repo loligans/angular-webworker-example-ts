@@ -6,7 +6,7 @@
   "apps": [
     {
       "root": "",
-      "outDir": "../dist/client",
+      "outDir": "../out/genetic-algorithm-client",
       "assets": [
         "assets",
         "favicon.ico"
@@ -32,10 +32,6 @@
   "lint": [
     {
       "project": "tsconfig.json",
-      "exclude": "**/node_modules/**"
-    },
-    {
-      "project": "tsconfig.spec.json",
       "exclude": "**/node_modules/**"
     }
   ],
