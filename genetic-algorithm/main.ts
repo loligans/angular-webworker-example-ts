@@ -1,7 +1,8 @@
 import { Candidate } from './candidate';
 import { GeneticAlgorithm } from './genetic-algorithm';
 
-const GA = new GeneticAlgorithm(500, 'This is the string we are looking for!');
+const solution = 'This is the string the genetic algorithm is looking for.';
+const GA = new GeneticAlgorithm(500, solution);
 var foundSolution: boolean;
 for (var i = 0; i < 20000; i++)
 {
