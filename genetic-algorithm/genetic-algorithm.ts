@@ -48,7 +48,7 @@ export class GeneticAlgorithm {
     return population;
   }
   private selectParents(): Array<Candidate> {
-    // Initialize the surviving parents collection
+    // Initialize the parents collection
     var numParents: number = this._Population.length * .80;
     var parents = new Array<Candidate>();
     
@@ -78,15 +78,14 @@ export class GeneticAlgorithm {
     return parents;
   }
   private crossover(parents: Array<Candidate>): Array<Candidate> {
-    // Calculate the number of children to produce
     var children = new Array<Candidate>();
-
     var parent1: Candidate;
     var parent2: Candidate;
     var child1: Buffer;
     var child2: Buffer;
     var crossLocation: number;
     for (var i = 0; i < parents.length; i += 2) {
+      // Selects the starting point for crossover
       crossLocation = this.randomInt(1, this.Solution.length);
       parent1 = this._Population[i];
       parent2 = this._Population[i+1];
@@ -111,7 +110,7 @@ export class GeneticAlgorithm {
     return children;
   }
   private mutate(children: Array<Candidate>): void {
-    // Chance to mutate 1/200 (.005%)
+    // Chance to mutate 1/50 (2%)
     const max: number = 50;
     const min: number = 0;
 
@@ -161,16 +160,9 @@ export class GeneticAlgorithm {
     this._Population = new Array<Candidate>(...children, ...survivors);
     this.sortPopulationFitness();
 
-    var solution = false;
+    // Check for the solution
     var maxFitness = Candidate.GeneRange * this.Solution.length;
-    var candidate: Candidate;
-    for (var i = 0; i < this._Population.length; i++) {
-      candidate = this._Population[i];
-      if (candidate.Fitness >= maxFitness) {
-        solution = true;
-        break;
-      }
-    }
+    var solution = this._Population[0].Fitness >= maxFitness;
 
     // Determine if solution was found
     return solution;
