@@ -12,9 +12,9 @@
       "env": {
         "NODE_ENV": "development",
       },
-      "program": "${workspaceRoot}/app/main.ts",
+      "program": "${workspaceRoot}/genetic-algorithm/main.ts",
       "outFiles": [
-        "${workspaceRoot}/dist/**/*.js"
+        "${workspaceRoot}/out/genetic-algorithm-js/**/*.js"
       ],
       "runtimeArgs": [
         "--nolazy"

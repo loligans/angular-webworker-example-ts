@@ -1,12 +1,81 @@
-#container {
+/* Container for entire component */
+.component-container {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 100%;
 }
-#menu {
+
+/* Genetic Algorithm Menu Options */
+.component-menu {
+  display: flex;
+  padding: 10px;
+  min-width: 300px;
+}
+mat-card {
+  height:auto; 
+  width: 100%; 
+  text-align: center;
+}
+mat-form-field {
+  width: 100%;
+}
+mat-list-item {
+  padding-top: 15px;
+}
+
+/* Genetic Algorithm Results */
+.component-content {
+  display: flex;
+  flex: 5;
+  padding: 10px;
+}
+
+.candidate-card {
   flex: 1;
 }
-#content {
-  flex: 5;
+
+.candidate-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.candidate-table {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.header-row, .row {
+  display: flex;
+  padding: 10px 0;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+  align-items: center;
+  height: auto;
+}
+
+/* Increase font size of headers */
+.chromosome-header-cell, .fitness-header-cell {
+  font-size: 24px;
+}
+
+.rank-header-cell, .rank-cell {
+  width: 50px;
+}
+
+.fitness-header-cell, .fitness-cell {
+  width: 110px;
+  padding-left: 10px;
+}
+
+.chromosome-header-cell, .chromosome-cell {
+  flex: 1;
+  max-height: 54px;
+  text-align: left;
+  word-break: break-all;
+  text-overflow: ellipsis;
 }
