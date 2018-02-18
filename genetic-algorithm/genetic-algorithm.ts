@@ -1,31 +1,29 @@
 import { Candidate } from './candidate';
 export class GeneticAlgorithm {
-  public readonly Solution: Buffer;
+  private _Solution: string;
   private _Population: Array<Candidate>;
+  private _MaximumFitness: number;
   private _PopulationFitness: number;
   public get Population(): Array<Candidate> { return this._Population; }
   public get PopulationFitness(): number { return this._PopulationFitness; }
 
   constructor(popSize: number, solution: string) {
     if (popSize % 2 === 1) popSize += 1;
-    this.Solution = Buffer.from(solution, 'utf8');
+    this._Solution = solution;
     this._Population = this.generatePopulation(popSize);
+    this._MaximumFitness = solution.length * Candidate.GeneRange;
   }
   private randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min) + min);
   }
   private generateChromosome(length: number): Buffer {
-    // The allowable range of characters
-    const max = 127;
-    const min = 32;
-
     // Build the chromosome
     var randomChromosome: string = '';
-    var randomChar: number;
+    var randomGene: number;
     for (var i = 0; i < length; i++)
     {
-      randomChar = this.randomInt(min, max);
-      randomChromosome += String.fromCharCode(randomChar);
+      randomGene = this.randomInt(Candidate.MinGene, Candidate.MaxGene);
+      randomChromosome += String.fromCharCode(randomGene);
     }
 
     // Returns the chromosome as a buffer
@@ -38,8 +36,8 @@ export class GeneticAlgorithm {
 
     // Fill the population with candidates
     for(var i = 0; i < popSize; i++) {
-      chromosome = this.generateChromosome(this.Solution.length);
-      population[i] = new Candidate(chromosome, this);
+      chromosome = this.generateChromosome(this._Solution.length);
+      population[i] = new Candidate([...chromosome], this._Solution);
       this._PopulationFitness += population[i].Fitness;
     }
 
@@ -81,29 +79,23 @@ export class GeneticAlgorithm {
     var children = new Array<Candidate>();
     var parent1: Candidate;
     var parent2: Candidate;
-    var child1: Buffer;
-    var child2: Buffer;
     var crossLocation: number;
     for (var i = 0; i < parents.length; i += 2) {
       // Selects the starting point for crossover
-      crossLocation = this.randomInt(1, this.Solution.length);
+      crossLocation = this.randomInt(1, this._Solution.length);
       parent1 = this._Population[i];
       parent2 = this._Population[i+1];
 
-      // Swap genes
-      child1 = Buffer.concat([
-        parent1.Chromosome.slice(0, crossLocation), 
-        parent2.Chromosome.slice(crossLocation)
-      ], this.Solution.length);
-      child2 = Buffer.concat([
-        parent2.Chromosome.slice(0, crossLocation), 
-        parent1.Chromosome.slice(crossLocation)
-      ], this.Solution.length);
-
-      // add children
+      // Swap genes and add children
       children.push(
-        new Candidate(child1, this), 
-        new Candidate(child2, this)
+        new Candidate([
+          ...parent1.Chromosome.slice(0, crossLocation), 
+          ...parent2.Chromosome.slice(crossLocation)
+        ], this._Solution), 
+        new Candidate([
+          ...parent2.Chromosome.slice(0, crossLocation), 
+          ...parent1.Chromosome.slice(crossLocation)
+        ], this._Solution)
       );
     }
 
@@ -114,31 +106,22 @@ export class GeneticAlgorithm {
     const max: number = 50;
     const min: number = 0;
 
-    // The allowable range of characters
-    const geneMax = 127;
-    const geneMin = 32;
-
     var mutate: boolean;
     var location: number;
     for(var child of children) {
       mutate = this.randomInt(min, max) == 0 ? true : false;
       if (mutate) {
         // Mutate the child in random location
-        location = this.randomInt(0, this.Solution.length);
-        child.Chromosome[location] = this.randomInt(geneMin, geneMax);
+        location = this.randomInt(0, this._Solution.length);
+        child.Chromosome[location] = this.randomInt(Candidate.MinGene, Candidate.MaxGene);
       }
     }
   }
   private selectSurvivors(): Array<Candidate> {
     const popSize: number = this._Population.length;
     const topPercentCandidates = popSize * .20;
-    var survivors = new Array<Candidate>();
-
-    for (var i = 0; i < topPercentCandidates; i++) {
-      survivors.push(new Candidate(this._Population[i].Chromosome, this));
-    }
     // Maybe choose a better selection method later on.
-    return survivors;
+    return this.Population.slice(0, topPercentCandidates);
   }
   private sortPopulationFitness() {
     this._PopulationFitness = 0;
@@ -161,8 +144,7 @@ export class GeneticAlgorithm {
     this.sortPopulationFitness();
 
     // Check for the solution
-    var maxFitness = Candidate.GeneRange * this.Solution.length;
-    var solution = this._Population[0].Fitness >= maxFitness;
+    var solution = this._Population[0].Fitness >= this._MaximumFitness;
 
     // Determine if solution was found
     return solution;
