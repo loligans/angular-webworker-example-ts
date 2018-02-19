@@ -1,20 +1,18 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "../dist/client-app",
+    "outDir": "../../out/genetic-algorithm-js",
     "baseUrl": "./",
     "module": "es2015",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "target": "es6",
     "types": [
       "node"
     ],
     "typeRoots": [
-      "node_modules/@types"
+      "../node_modules/@types"
     ],
     "lib": [
       "es2017",

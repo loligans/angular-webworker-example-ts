@@ -1,11 +1,11 @@
 {
-  "$schema": "../node_modules/@angular/cli/lib/config/schema.json",
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "genetic-algorithm-js"
+    "name": "genetic-algorithm-client"
   },
   "apps": [
     {
-      "root": "",
+      "root": "src",
       "outDir": "../out/genetic-algorithm-client",
       "assets": [
         "assets",
@@ -16,7 +16,6 @@
       "polyfills": "polyfills.ts",
       "test": "test.ts",
       "tsconfig": "tsconfig.json",
-      "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
         "styles.css"

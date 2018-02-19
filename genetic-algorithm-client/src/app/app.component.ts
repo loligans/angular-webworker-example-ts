@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Candidate } from '../../genetic-algorithm/candidate';
-import { GeneticAlgorithm } from '../../genetic-algorithm/genetic-algorithm';
+import { Candidate } from '../../../genetic-algorithm/candidate';
+import { GeneticAlgorithm } from '../../../genetic-algorithm/genetic-algorithm';
 
 @Component({
   selector: 'app-root',

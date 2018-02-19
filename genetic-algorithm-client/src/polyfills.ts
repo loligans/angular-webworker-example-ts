@@ -62,5 +62,6 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 
 
 /***************************************************************************************************
- * APPLICATION IMPORTS
+ * Hammerjs is required for multi-touch gestures
  */
+import 'hammerjs/hammer';
