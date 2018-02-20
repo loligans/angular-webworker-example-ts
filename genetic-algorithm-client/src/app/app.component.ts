@@ -34,7 +34,9 @@ export class AppComponent {
   public CurrentGeneration: number = 0;
   /// The list of candidates to display in the table
   public Population: Array<Candidate> = [];
-  
+
+  public StartTime;
+  public GenerationsPerSeconds: string = '0';
 
   constructor (gaService: GeneticAlgorithmService) {
     this.GeneticAlgorithmService = gaService;
@@ -63,6 +65,7 @@ export class AppComponent {
     this.Running = true;
     this.Initialized = true;
     this.Solution = this.scrubString(this.Solution);
+    this.StartTime = Date.now();
     this.GeneticAlgorithmService.init(this.PopulationSize, this.Solution, this.onGenerationComputed.bind(this));
     this.continueGeneticAlgorithm();
   }
@@ -85,17 +88,27 @@ export class AppComponent {
     this.Generation = 0;
     this.Progress = 0;
     this.CurrentGeneration = 0;
+    this.GenerationsPerSeconds = '0';
   }
 
   public onGenerationComputed(event: MessageEvent): void {
     const result: GAResult = event.data;
+
+    // The workers posts messages every 100 generations.
     this.CurrentGeneration += 100;
     this.Generation = result.Generation;
     this.Progress = (this.CurrentGeneration / this.Generations) * 100;
+
+    // Update table with population
     this.Population = result.Population.slice(0, 20);
     this.FoundSolution = result.FoundSolution;
     this.Running = result.Running;
 
+    // Calculate Generations/s
+    const endTime = Date.now() - this.StartTime;
+    this.GenerationsPerSeconds = `${this.Generation} - ${(this.Generation / (endTime / 1000)).toFixed(2)} Generations/s`;
+
+    // Finish progress bar
     if(this.FoundSolution) {
       this.Progress = 100;
     }
