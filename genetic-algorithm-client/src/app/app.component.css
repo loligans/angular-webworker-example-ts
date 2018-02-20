@@ -10,7 +10,7 @@
 .component-menu {
   display: flex;
   padding: 10px;
-  min-width: 300px;
+  min-width: 400px;
 }
 mat-card {
   height:auto; 

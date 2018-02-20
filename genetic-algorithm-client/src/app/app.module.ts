@@ -11,7 +11,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+
 import { AppComponent } from './app.component';
+import { GeneticAlgorithmService } from './services/genetic-algorithm.service'
 
 @NgModule({
   declarations: [
@@ -28,10 +32,12 @@ import { AppComponent } from './app.component';
     MatTooltipModule,
     MatListModule,
     MatSliderModule,
-    MatCardModule
+    MatCardModule,
+    MatExpansionModule,
+    MatProgressBarModule
   ],
   entryComponents: [AppComponent],
-  providers: [],
+  providers: [GeneticAlgorithmService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
