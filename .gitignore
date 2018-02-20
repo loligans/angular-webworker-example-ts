@@ -1,12 +1,14 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-/out/*
-!out/.gitkeep
 /dist
 /dist-server
 /tmp
 /out-tsc
+/genetic-algorithm/out/*
+!/genetic-algorithm/out/.gitkeep
+/genetic-algorithm-client/out/*
+!/genetic-algorithm-client/out/.gitkeep
 
 # dependencies
 /**/node_modules
