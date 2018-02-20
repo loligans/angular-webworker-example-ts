@@ -1,17 +1,17 @@
 import { Candidate } from './candidate';
 export class GeneticAlgorithm {
   private _Solution: string;
-  private _Population: Array<Candidate>;
-  private _MaximumFitness: number;
-  private _PopulationFitness: number;
-  public get Population(): Array<Candidate> { return this._Population; }
-  public get PopulationFitness(): number { return this._PopulationFitness; }
+  public Population: Array<Candidate>;
+  public Generation: number;
+  public MaximumFitness: number;
+  public PopulationFitness: number;
 
   constructor(popSize: number, solution: string) {
     if (popSize % 2 === 1) popSize += 1;
     this._Solution = solution;
-    this._Population = this.generatePopulation(popSize);
-    this._MaximumFitness = solution.length * Candidate.GeneRange;
+    this.Population = this.generatePopulation(popSize);
+    this.Generation = 0;
+    this.MaximumFitness = solution.length * Candidate.GeneRange;
   }
   private randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min) + min);
@@ -38,7 +38,7 @@ export class GeneticAlgorithm {
     for(var i = 0; i < popSize; i++) {
       chromosome = this.generateChromosome(this._Solution.length);
       population[i] = new Candidate([...chromosome], this._Solution);
-      this._PopulationFitness += population[i].Fitness;
+      this.PopulationFitness += population[i].Fitness;
     }
 
     // Sort population by fitness
@@ -47,11 +47,11 @@ export class GeneticAlgorithm {
   }
   private selectParents(): Array<Candidate> {
     // Initialize the parents collection
-    var numParents: number = this._Population.length * .80;
+    var numParents: number = this.Population.length * .80;
     var parents = new Array<Candidate>();
     
     // Calculate the stochastic interval and starting point
-    var interval: number = this._PopulationFitness / numParents;
+    var interval: number = this.PopulationFitness / numParents;
     var startingPoint = this.randomInt(0, interval);
 
     // Calculate the points 
@@ -67,10 +67,10 @@ export class GeneticAlgorithm {
       index = 0;
       fitnessSum = 0;
       while (fitnessSum < p) {
-        fitnessSum += this._Population[index].Fitness
+        fitnessSum += this.Population[index].Fitness
         index++;
       }
-      parents.push(this._Population[index]);
+      parents.push(this.Population[index]);
     }
     
     return parents;
@@ -83,8 +83,8 @@ export class GeneticAlgorithm {
     for (var i = 0; i < parents.length; i += 2) {
       // Selects the starting point for crossover
       crossLocation = this.randomInt(1, this._Solution.length);
-      parent1 = this._Population[i];
-      parent2 = this._Population[i+1];
+      parent1 = this.Population[i];
+      parent2 = this.Population[i+1];
 
       // Swap genes and add children
       children.push(
@@ -118,17 +118,17 @@ export class GeneticAlgorithm {
     }
   }
   private selectSurvivors(): Array<Candidate> {
-    const popSize: number = this._Population.length;
+    const popSize: number = this.Population.length;
     const topPercentCandidates = popSize * .20;
     // Maybe choose a better selection method later on.
     return this.Population.slice(0, topPercentCandidates);
   }
   private sortPopulationFitness() {
-    this._PopulationFitness = 0;
-    for (var candidate of this._Population) {
-      this._PopulationFitness += candidate.Fitness;
+    this.PopulationFitness = 0;
+    for (var candidate of this.Population) {
+      this.PopulationFitness += candidate.Fitness;
     }
-    this._Population.sort((a, b) => b.Fitness - a.Fitness);
+    this.Population.sort((a, b) => b.Fitness - a.Fitness);
   }
   public computeGeneration(): boolean {
     // Create the children of the next generation
@@ -140,11 +140,12 @@ export class GeneticAlgorithm {
     var survivors = this.selectSurvivors();
 
     // Update the population with the new children and survivors then resort
-    this._Population = new Array<Candidate>(...children, ...survivors);
+    this.Population = new Array<Candidate>(...children, ...survivors);
+    this.Generation += 1;
     this.sortPopulationFitness();
 
     // Check for the solution
-    var solution = this._Population[0].Fitness >= this._MaximumFitness;
+    var solution = this.Population[0].Fitness >= this.MaximumFitness;
 
     // Determine if solution was found
     return solution;

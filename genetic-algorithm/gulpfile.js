@@ -1,5 +1,4 @@
 var spawn = require('child_process').spawnSync;
-var yargs = require('yargs').argv;
 
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
@@ -9,10 +8,10 @@ var sourcemaps = require('gulp-sourcemaps');
 var clean = require('gulp-clean');
 var nodemon = require('gulp-nodemon');
 
-var serverTsProject = ts.createProject('genetic-algorithm/tsconfig.json');
+var serverTsProject = ts.createProject('./src/tsconfig.json');
 
 gulp.task('clean', () => {
-  return gulp.src('out/genetic-algorithm-js', {read: false}).pipe(clean());
+  return gulp.src('./out/**/*', {read: false}).pipe(clean());
 });
 
 gulp.task('build', ['clean'], () => {
@@ -21,13 +20,13 @@ gulp.task('build', ['clean'], () => {
                         .pipe(serverTsProject())
                         .js
                         .pipe(babel({
-                          presets: ['env']
+                          "presets": ['env']
                         }))
                         //.pipe(uglify())
                         .pipe(sourcemaps.write('.'))
-                        .pipe(gulp.dest('out/genetic-algorithm-js'));
+                        .pipe(gulp.dest('./out'));
 });
 
 gulp.task('start', () => {
-  return spawn('node', ['out/genetic-algorithm-js/main.js'], {stdio: 'inherit'});
+  return spawn('node', ['./out/main.js'], {stdio: 'inherit'});
 });
