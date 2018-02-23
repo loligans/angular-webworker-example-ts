@@ -7,48 +7,32 @@ let GA: GeneticAlgorithmWorker;
 class GeneticAlgorithmWorker {
   private GeneticAlgorithm: GeneticAlgorithm;
   private Solution: string;
-  private FoundSolution: boolean;
   constructor(settings: GAInitialize) {
     this.GeneticAlgorithm = new GeneticAlgorithm(settings.PopulationSize, settings.Solution);
-    
-    customPostMessage({
-      Type: MessageType.Result, 
-      Running: false,
-      FoundSolution: false, 
-      Generation: this.GeneticAlgorithm.Generation,
-      Population: this.GeneticAlgorithm.Population
-    });
+    this.postMessage(false);
   }
 
   public computeGeneration(generations: number) {
-    let solution: boolean = false;
+    let foundSolution: boolean = false;
 
     for (let i = 1; i <= generations; i++) {
-      solution = this.GeneticAlgorithm.computeGeneration();
-      if (solution) {
-        customPostMessage({
-          Type: MessageType.Result,
-          Running: false,
-          FoundSolution: solution,
-          Generation: this.GeneticAlgorithm.Generation,
-          Population: this.GeneticAlgorithm.Population
-        });
+      foundSolution = this.GeneticAlgorithm.computeGeneration();
+      if (foundSolution) {
+        this.postMessage(foundSolution);
         return;
       } else if (i % 100 === 0) {
-        customPostMessage({
-          Type: MessageType.Result,
-          Running: true,
-          FoundSolution: solution,
-          Generation: this.GeneticAlgorithm.Generation,
-          Population: this.GeneticAlgorithm.Population
-        });
+        this.postMessage(foundSolution);
       }
     }
 
+    this.postMessage(foundSolution);
+  }
+
+  private postMessage(foundSolution: boolean) {
     customPostMessage({
       Type: MessageType.Result,
       Running: false,
-      FoundSolution: solution,
+      FoundSolution: foundSolution,
       Generation: this.GeneticAlgorithm.Generation,
       Population: this.GeneticAlgorithm.Population
     });
