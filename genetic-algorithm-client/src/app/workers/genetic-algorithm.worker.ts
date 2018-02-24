@@ -1,5 +1,5 @@
 import { GeneticAlgorithm } from "../../../../genetic-algorithm/src/genetic-algorithm";
-import { MessageType, GAInitialize } from "./genetic-algorithm-messages";
+import { MessageType, GAInitialize, GACompute, GAResult } from "./genetic-algorithm-messages";
 // prevent TypeScript compile error
 const customPostMessage: any = postMessage;
 let GA: GeneticAlgorithmWorker;
@@ -29,22 +29,23 @@ class GeneticAlgorithmWorker {
   }
 
   private postMessage(foundSolution: boolean, running: boolean = false) {
-    customPostMessage({
+    const result: GAResult = {
       Type: MessageType.Result,
       Running: running,
       FoundSolution: foundSolution,
       Generation: this.GeneticAlgorithm.Generation,
       Population: this.GeneticAlgorithm.Population
-    });
+    };
+    customPostMessage(result);
   }
 }
 
 // Worker API
 onmessage = function (event: MessageEvent) {
-  const message = event.data;
+  const message: GAInitialize | GACompute = event.data;
   if (message.Type === MessageType.Initialize) {
-    GA = new GeneticAlgorithmWorker(message);
+    GA = new GeneticAlgorithmWorker(<GAInitialize>message);
   } else if (message.Type === MessageType.Compute) {
-    GA.computeGeneration(message.Generations);
+    GA.computeGeneration((<GACompute>message).Generations);
   }
 };
