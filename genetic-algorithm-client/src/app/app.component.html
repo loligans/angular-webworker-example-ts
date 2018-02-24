@@ -75,7 +75,7 @@
             matTooltipPosition="right">
               <button 
               mat-raised-button 
-              (click)="Initialized ? continueGeneticAlgorithm() : startGeneticAlgorithm()" 
+              (click)="Initialized ? continueGeneticAlgorithm(Generations) : startGeneticAlgorithm()" 
               [disabled]="Running">{{Initialized ? 'Continue' : 'Start'}}</button>
             </div>
           </div>

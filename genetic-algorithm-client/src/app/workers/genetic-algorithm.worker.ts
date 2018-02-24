@@ -21,17 +21,17 @@ class GeneticAlgorithmWorker {
         this.postMessage(foundSolution);
         return;
       } else if (i % 100 === 0) {
-        this.postMessage(foundSolution);
+        this.postMessage(foundSolution, true);
       }
     }
 
     this.postMessage(foundSolution);
   }
 
-  private postMessage(foundSolution: boolean) {
+  private postMessage(foundSolution: boolean, running: boolean = false) {
     customPostMessage({
       Type: MessageType.Result,
-      Running: false,
+      Running: running,
       FoundSolution: foundSolution,
       Generation: this.GeneticAlgorithm.Generation,
       Population: this.GeneticAlgorithm.Population
