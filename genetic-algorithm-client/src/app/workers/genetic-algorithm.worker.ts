@@ -1,5 +1,5 @@
 import { GeneticAlgorithm } from "../../../../genetic-algorithm/src/genetic-algorithm";
-import { MessageType, GAInitialize, GACompute, GAResult } from "./genetic-algorithm-messages";
+import { MessageType, GAInitialize } from "./genetic-algorithm-messages";
 // prevent TypeScript compile error
 const customPostMessage: any = postMessage;
 let GA: GeneticAlgorithmWorker;

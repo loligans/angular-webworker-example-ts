@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Candidate } from '../../../../genetic-algorithm/src/candidate.js';
-import { GeneticAlgorithm } from '../../../../genetic-algorithm/src/genetic-algorithm.js';
-import { GAInitialize, GAResult, GACompute, MessageType } from '../workers/genetic-algorithm-messages';
+import { MessageType } from '../workers/genetic-algorithm-messages';
 import * as GeneticAlgorithmWorker from 'worker-loader!../../../out/genetic-algorithm.worker.bundle.js';
 
+@Injectable()
 export class GeneticAlgorithmService {
   private _GeneticAlgorithmWorker: Worker;
   private _GeneticAlgorithmCallback: (event: MessageEvent) => void;
 
   public init(popSize: number, solution: string, callback: (event: MessageEvent) => void): void {
-    if(this._GeneticAlgorithmCallback ||
-       this._GeneticAlgorithmWorker) {
+    if(this._GeneticAlgorithmWorker) {
       return;
     }
     // Initialize the worker
@@ -27,8 +25,7 @@ export class GeneticAlgorithmService {
   }
 
   public computeGeneration(generations: number) {
-    if (!this._GeneticAlgorithmCallback ||
-        !this._GeneticAlgorithmWorker) {
+    if (!this._GeneticAlgorithmWorker) {
       return;
     }
 

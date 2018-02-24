@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Candidate } from '../../../genetic-algorithm/src/candidate';
-import { GeneticAlgorithm } from '../../../genetic-algorithm/src/genetic-algorithm';
 import { GeneticAlgorithmService } from './services/genetic-algorithm.service';
 import { GAResult } from './workers/genetic-algorithm-messages';
-import { NgProgress } from 'ngx-progressbar';
 
 @Component({
   selector: 'app-root',
@@ -14,34 +12,30 @@ import { NgProgress } from 'ngx-progressbar';
 export class AppComponent {
   private GeneticAlgorithmService: GeneticAlgorithmService;
   public Columns: Array<string> = ['Rank', 'Fitness', 'Chromosome']
-  /// The solution string the genetic algorithm is looking for
   public Solution: string = "How are you gentleman? All your base are belong to us.";
-  /// Determines the size of the genetic algorithm population
   public PopulationSize: number = 500;
-  /// The number of generations to compute before stopping
   public Generations: number = 10000;
-  /// Stores the progress of the genetic algorithm for a single run
   public Progress: number = 0;
-  /// True if the GeneticAlgorithmService found a solution
+  public GenerationsPerSeconds: string = '0';
+  public Population: Array<Candidate> = [];
+
   public FoundSolution: boolean = false;
-  /// True if the GeneticAlgorithmService is initialized
   public Initialized: boolean = false;
-  /// True if the GeneticAlgorithmService is running
   public Running: boolean = false;
   /// The current generation of the genetic algorithm
   public Generation: number = 0;
   /// Current generation in a single run.
   public CurrentGeneration: number = 0;
-  /// The list of candidates to display in the table
-  public Population: Array<Candidate> = [];
-
-  public StartTime;
-  public GenerationsPerSeconds: string = '0';
+  public StartTime: number;
 
   constructor (gaService: GeneticAlgorithmService) {
     this.GeneticAlgorithmService = gaService;
   }
 
+  /**
+   * Removes any invalid characters from a solution string.
+   * @param str The string to scrub.
+   */
   private scrubString(str: string): string {
     let result: string = '';
     let charCode: number;
@@ -57,6 +51,10 @@ export class AppComponent {
     return result;
   }
 
+  /**
+   * Converts an array of numbers to a string.
+   * @param chars The Array<number> to convert to a string.
+   */
   public getString(chars: Array<number>): string {
     return String.fromCharCode(...chars);
   }
@@ -67,19 +65,26 @@ export class AppComponent {
     this.Solution = this.scrubString(this.Solution);
     this.StartTime = Date.now();
     this.GeneticAlgorithmService.init(this.PopulationSize, this.Solution, this.onGenerationComputed.bind(this));
-    this.continueGeneticAlgorithm();
+    this.continueGeneticAlgorithm(this.Generations);
   }
 
-  public continueGeneticAlgorithm() {
+  /**
+   * Continues running the genetic algorithm if a solution hasn't been found.
+   * @param generations The numbers of generations to compute before stopping.
+   */
+  public continueGeneticAlgorithm(generations: number): void {
     if (this.FoundSolution) {
       return;
     }
     this.Progress = 0;
     this.CurrentGeneration = 0;
-    this.GeneticAlgorithmService.computeGeneration(this.Generations);
+    this.GeneticAlgorithmService.computeGeneration(generations);
   }
 
-  public resetGeneticAlgorithm() {
+  /**
+   * Terminates the WebWorker and sets properties back to their defaults.
+   */
+  public resetGeneticAlgorithm(): void {
     this.GeneticAlgorithmService.reset();
     this.Running = false;
     this.Initialized = false;
@@ -91,6 +96,10 @@ export class AppComponent {
     this.GenerationsPerSeconds = '0';
   }
 
+  /**
+   * Callback after WebWorker completes a number of generations.
+   * @param event Object containing details about the event
+   */
   public onGenerationComputed(event: MessageEvent): void {
     const result: GAResult = event.data;
 
