@@ -1,4 +1,4 @@
-import { Candidate } from "../../../../genetic-algorithm/src/candidate";
+import { Candidate } from "string-evolver-ts";
 
 /** Determines the type of message sent to the GeneticAlgorithmWorker */
 export enum MessageType {

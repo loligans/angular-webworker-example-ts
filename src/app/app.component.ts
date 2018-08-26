@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Candidate } from '../../../genetic-algorithm/src/candidate';
+import { Candidate } from 'string-evolver-ts';
 import { GeneticAlgorithmService } from './services/genetic-algorithm.service';
 import { GAResult } from './workers/genetic-algorithm-messages';
 

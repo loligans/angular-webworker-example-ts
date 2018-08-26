@@ -5,10 +5,8 @@
 /dist-server
 /tmp
 /out-tsc
-/genetic-algorithm/out/*
-!/genetic-algorithm/out/.gitkeep
-/genetic-algorithm-client/out/*
-!/genetic-algorithm-client/out/.gitkeep
+/out/*
+!/out/.gitkeep
 
 # dependencies
 /**/node_modules
