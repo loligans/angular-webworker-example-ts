@@ -16,8 +16,8 @@ module.exports = {
     ]
   },
   "entry": {
-    "../out/genetic-algorithm.worker.bundle": [
-      './app/workers/genetic-algorithm.worker.ts'
+    "../out/string-evolver.worker.bundle": [
+      './app/workers/string-evolver.worker.ts'
     ]
   },
 

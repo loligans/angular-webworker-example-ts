@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Candidate } from 'string-evolver-ts';
-import { GeneticAlgorithmService } from './services/genetic-algorithm.service';
-import { GAResult } from './workers/genetic-algorithm-messages';
+import { StringEvolverService } from './services/string-evolver.service';
+import { GAResult } from './workers/string-evolver-messages';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [ GeneticAlgorithmService ]
+  providers: [ StringEvolverService ]
 })
 export class AppComponent {
-  private GeneticAlgorithmService: GeneticAlgorithmService;
+  private StringEvolverService: StringEvolverService;
   public Columns: Array<string> = ['Rank', 'Fitness', 'Chromosome']
   public Solution: string = "How are you gentleman? All your base are belong to us.";
   public PopulationSize: number = 500;
@@ -22,14 +22,14 @@ export class AppComponent {
   public FoundSolution: boolean = false;
   public Initialized: boolean = false;
   public Running: boolean = false;
-  /// The current generation of the genetic algorithm
+  /// The current generation of the string evolver
   public Generation: number = 0;
   /// Current generation in a single run.
   public CurrentGeneration: number = 0;
   public StartTime: number;
 
-  constructor (gaService: GeneticAlgorithmService) {
-    this.GeneticAlgorithmService = gaService;
+  constructor (gaService: StringEvolverService) {
+    this.StringEvolverService = gaService;
   }
 
   /**
@@ -59,33 +59,33 @@ export class AppComponent {
     return String.fromCharCode(...chars);
   }
 
-  public startGeneticAlgorithm(): void {
+  public startStringEvolver(): void {
     this.Running = true;
     this.Initialized = true;
     this.Solution = this.scrubString(this.Solution);
     this.StartTime = Date.now();
-    this.GeneticAlgorithmService.init(this.PopulationSize, this.Solution, this.onGenerationComputed.bind(this));
-    this.continueGeneticAlgorithm(this.Generations);
+    this.StringEvolverService.init(this.PopulationSize, this.Solution, this.onGenerationComputed.bind(this));
+    this.continueStringEvolver(this.Generations);
   }
 
   /**
    * Continues running the genetic algorithm if a solution hasn't been found.
    * @param generations The numbers of generations to compute before stopping.
    */
-  public continueGeneticAlgorithm(generations: number): void {
+  public continueStringEvolver(generations: number): void {
     if (this.FoundSolution) {
       return;
     }
     this.Progress = 0;
     this.CurrentGeneration = 0;
-    this.GeneticAlgorithmService.computeGeneration(generations);
+    this.StringEvolverService.computeGeneration(generations);
   }
 
   /**
    * Terminates the WebWorker and sets properties back to their defaults.
    */
-  public resetGeneticAlgorithm(): void {
-    this.GeneticAlgorithmService.reset();
+  public resetStringEvolver(): void {
+    this.StringEvolverService.reset();
     this.Running = false;
     this.Initialized = false;
     this.FoundSolution = false;

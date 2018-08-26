@@ -15,7 +15,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AppComponent } from './app.component';
-import { GeneticAlgorithmService } from './services/genetic-algorithm.service'
+import { StringEvolverService } from './services/string-evolver.service'
 
 @NgModule({
   declarations: [
@@ -37,7 +37,7 @@ import { GeneticAlgorithmService } from './services/genetic-algorithm.service'
     MatProgressBarModule
   ],
   entryComponents: [AppComponent],
-  providers: [GeneticAlgorithmService],
+  providers: [StringEvolverService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

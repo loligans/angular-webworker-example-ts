@@ -6,7 +6,7 @@
   height: 100%;
 }
 
-/* Genetic Algorithm Menu Options */
+/* String Evolver Menu Options */
 .component-menu {
   display: flex;
   padding: 10px;
@@ -24,7 +24,7 @@ mat-list-item {
   padding-top: 15px;
 }
 
-/* Genetic Algorithm Results */
+/* String Evolver Results */
 .component-content {
   display: flex;
   flex: 5;

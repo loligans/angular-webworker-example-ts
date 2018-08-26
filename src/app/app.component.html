@@ -1,7 +1,7 @@
 <div class="component-container">
   <div class="component-menu">
     <mat-card style="overflow-y: scroll;">
-      Genetic Algorithm
+      String Evolver
       <mat-list>
         <mat-divider></mat-divider>
         <mat-list-item style="height: auto;">
@@ -21,7 +21,7 @@
         <mat-divider></mat-divider>
         <mat-list-item>
           <mat-form-field 
-          matTooltip="The total number of candidates to execute the genetic algorithm on." 
+          matTooltip="The total number of candidates to execute the string evolver on." 
           matTooltipPosition="right">
             <input 
             mat-line 
@@ -66,7 +66,7 @@
             matTooltipPosition="right">
               <button 
               mat-raised-button 
-              (click)="resetGeneticAlgorithm()" 
+              (click)="resetStringEvolver()" 
               [disabled]="Running">Reset</button>
             </div>
             <div 
@@ -75,7 +75,7 @@
             matTooltipPosition="right">
               <button 
               mat-raised-button 
-              (click)="Initialized ? continueGeneticAlgorithm(Generations) : startGeneticAlgorithm()" 
+              (click)="Initialized ? continueStringEvolver(Generations) : startStringEvolver()" 
               [disabled]="Running">{{Initialized ? 'Continue' : 'Start'}}</button>
             </div>
           </div>
