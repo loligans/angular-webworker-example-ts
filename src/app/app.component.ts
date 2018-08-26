@@ -69,7 +69,7 @@ export class AppComponent {
   }
 
   /**
-   * Continues running the genetic algorithm if a solution hasn't been found.
+   * Continues running the string evolver if a solution hasn't been found.
    * @param generations The numbers of generations to compute before stopping.
    */
   public continueStringEvolver(generations: number): void {
