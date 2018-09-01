@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Candidate } from 'string-evolver-ts';
 import { StringEvolverService } from './services/string-evolver.service';
 import { GAResult } from './workers/string-evolver-messages';
@@ -13,7 +13,7 @@ export class AppComponent {
   private StringEvolverService: StringEvolverService;
   public Columns: Array<string> = ['Rank', 'Fitness', 'Chromosome']
   public Solution: string = "How are you gentleman? All your base are belong to us.";
-  public PopulationSize: number = 500;
+  public PopulationSize: number = 200;
   public Generations: number = 10000;
   public Progress: number = 0;
   public GenerationsPerSeconds: string = '0';

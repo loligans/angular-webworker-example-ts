@@ -3,13 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "ng": "ng",
     "start": "npm run worker; ng serve --delete-output-path false",
     "build": "npm run worker; ng build --prod --delete-output-path false",
+    "worker": "cd src; webpack --config webpack.worker.config.js; cd ..;",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "worker": "cd src; webpack --config webpack.worker.config.js; cd ..;"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -42,16 +41,7 @@
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "^6.0.100",
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
     "codelyzer": "^4.0.1",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.1",
-    "gulp-clean": "^0.4.0",
-    "gulp-nodemon": "^2.2.1",
-    "gulp-sourcemaps": "^2.6.4",
-    "gulp-typescript": "^3.2.4",
-    "gulp-uglify": "^3.0.0",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~2.0.0",
