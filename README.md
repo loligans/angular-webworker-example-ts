@@ -1,3 +1,6 @@
+# Archived
+This project is no longer maintained.
+
 # Description
 This project uses a web worker to offload computationally intensive work so that the main UI doesn't freeze. The computationally expensive work is a genetic algorithm that searches for a given solution string. 
 
